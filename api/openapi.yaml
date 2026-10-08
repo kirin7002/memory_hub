@@ -1,0 +1,1679 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "MemoryHub cloud prototype",
+    "version": "0.1.0",
+    "description": "Implemented prototype endpoints only. Development authentication; production identity, calibrated time APIs, summary/Outbox worker and deletion are not yet implemented."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:18080"
+    }
+  ],
+  "paths": {
+    "/v1/contexts": {
+      "post": {
+        "operationId": "createContext",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContext"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/conversations": {
+      "post": {
+        "operationId": "createConversation",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConversation"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listConversations",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "after_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/contexts/active": {
+      "get": {
+        "operationId": "activeContexts",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "after_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/contexts/{id}": {
+      "get": {
+        "operationId": "getContext",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/v1/contexts/{id}/commands": {
+      "post": {
+        "operationId": "command",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Command"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/conversations/{id}/messages": {
+      "post": {
+        "operationId": "message",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Message"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/conversations/{id}/events": {
+      "get": {
+        "operationId": "events",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "after_conv_seq",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Seq"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/conversations/{id}/timeline": {
+      "get": {
+        "operationId": "timeline",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/contexts/{id}/assemble": {
+      "post": {
+        "operationId": "assemble",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Assemble"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/device-agent/contexts/{id}/runs/claim": {
+      "post": {
+        "operationId": "claim",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/device-agent/runs/{id}/renew": {
+      "post": {
+        "operationId": "renew",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/device-agent/runs/{id}/interpretations": {
+      "post": {
+        "operationId": "interpret",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Interpretation"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/device-agent/runs/{id}/results": {
+      "post": {
+        "operationId": "result",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Result"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/device-agent/runs/{id}/fail": {
+      "post": {
+        "operationId": "failRun",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runs/{id}": {
+      "get": {
+        "operationId": "getRun",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/v1/runs/{id}/cancel": {
+      "post": {
+        "operationId": "cancelRun",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/device-agent/executions": {
+      "post": {
+        "operationId": "importExecution",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Execution"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/device-agent/executions/{id}/reconcile": {
+      "post": {
+        "operationId": "reconcile",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sync/snapshot": {
+      "post": {
+        "operationId": "snapshot",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/sync/changes": {
+      "get": {
+        "operationId": "changes",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/sync/ack": {
+      "post": {
+        "operationId": "ack",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ack"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sync/notifications": {
+      "get": {
+        "operationId": "sse",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Watermark hints; fetch changes using the signed sync cursor",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/livez": {
+      "get": {
+        "operationId": "livez",
+        "responses": {
+          "200": {
+            "description": "Health status"
+          },
+          "503": {
+            "description": "Not ready"
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "operationId": "readyz",
+        "responses": {
+          "200": {
+            "description": "Health status"
+          },
+          "503": {
+            "description": "Not ready"
+          }
+        }
+      }
+    },
+    "/v1/demo/session": {
+      "post": {
+        "operationId": "demoSession",
+        "description": "Opt-in local development only (WEB_DEMO_ENABLED=true). Issues a short-lived account/device/page-bound credential. Explicit development accounts are provisioned on connection in tenant demo; omitted user_id preserves seeded demo-user behavior. Browser cross-site requests are rejected and revoked devices remain revoked. This is not production account login.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoSessionResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/demo/chat": {
+      "post": {
+        "operationId": "demoChat",
+        "description": "Opt-in server-held model proxy. Persists input, claims a device Run, assembles context, calls the configured model and persists the reply before responding. Completed requests are cached per user/device/request_id for 10 minutes in this process; not durable across restarts. Changed request payload or in-progress duplicate returns 409; model unavailable 503, cache capacity 429. No automatic paid retry.",
+        "security": [
+          {
+            "DevelopmentBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoChatResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "DevelopmentBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "MemoryHub development HMAC token"
+      }
+    },
+    "schemas": {
+      "Seq": {
+        "type": "string",
+        "pattern": "^[0-9]+$",
+        "description": "64-bit integer encoded as a decimal string"
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "Timing": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "type": "integer",
+            "const": 1
+          },
+          "origin_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "boot_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "clock_segment_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "stream_seq": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "monotonic_ns": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "source_time": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "calibration_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "causal_parent_event_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "maxItems": 16
+          }
+        },
+        "required": [
+          "schema_version",
+          "origin_id",
+          "boot_id",
+          "clock_segment_id",
+          "stream_seq",
+          "monotonic_ns"
+        ]
+      },
+      "Message": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32768,
+            "description": "Server additionally enforces 32 KiB UTF-8 bytes"
+          },
+          "observed_context_version": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "offline": {
+            "type": "boolean"
+          },
+          "timing": {
+            "$ref": "#/components/schemas/Timing"
+          }
+        },
+        "required": [
+          "event_id",
+          "text",
+          "observed_context_version",
+          "timing"
+        ]
+      },
+      "OfflineEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32768,
+            "description": "Server additionally enforces 32 KiB UTF-8 bytes"
+          },
+          "observed_context_version": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "offline": {
+            "type": "boolean"
+          },
+          "timing": {
+            "$ref": "#/components/schemas/Timing"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "user_message",
+              "assistant_message",
+              "tool_call",
+              "tool_result"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "event_id",
+          "text",
+          "observed_context_version",
+          "timing"
+        ]
+      },
+      "CreateConversation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "context_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "task_type": {
+            "type": "string",
+            "enum": [
+              "chat",
+              "trip_planning"
+            ]
+          }
+        },
+        "required": []
+      },
+      "CreateContext": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "context_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "task_type": {
+            "type": "string",
+            "enum": [
+              "chat",
+              "trip_planning"
+            ]
+          }
+        },
+        "required": [
+          "task_type"
+        ]
+      },
+      "RunRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expected_context_version": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "token": {
+            "$ref": "#/components/schemas/Seq"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_context_version"
+        ]
+      },
+      "Proposal": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "proposal_id": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string",
+            "enum": [
+              "destination",
+              "departure_time"
+            ]
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "source_event_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "maxItems": 100
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "value",
+          "source_event_ids"
+        ]
+      },
+      "Interpretation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expected_context_version": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "token": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "input_event_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "maxItems": 100
+          },
+          "patches": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/Proposal"
+            }
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_context_version",
+          "token",
+          "input_event_ids"
+        ]
+      },
+      "Result": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expected_context_version": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "token": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "event_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32768
+          },
+          "timing": {
+            "$ref": "#/components/schemas/Timing"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_context_version",
+          "token",
+          "event_id",
+          "text",
+          "timing"
+        ]
+      },
+      "Execution": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "execution_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "conversation_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "context_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "base_context_version": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "base_source_revision": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "base_policy_epoch": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "events": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/OfflineEvent"
+            }
+          },
+          "patches": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/Proposal"
+            }
+          }
+        },
+        "required": [
+          "execution_id",
+          "conversation_id",
+          "context_id",
+          "base_context_version",
+          "base_source_revision",
+          "base_policy_epoch",
+          "events"
+        ]
+      },
+      "Command": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expected_context_version": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "command": {
+            "type": "string",
+            "enum": [
+              "confirm_slot",
+              "cancel_task",
+              "resume_task",
+              "set_execution_target"
+            ]
+          },
+          "proposal_id": {
+            "type": "string"
+          },
+          "execution_target": {
+            "type": "string",
+            "enum": [
+              "device"
+            ]
+          }
+        },
+        "required": [
+          "command_id",
+          "expected_context_version",
+          "command"
+        ]
+      },
+      "Assemble": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "min_user_seq": {
+            "$ref": "#/components/schemas/Seq"
+          },
+          "model_profile_id": {
+            "type": "string",
+            "enum": [
+              "mock-16k",
+              "car-local-8k",
+              "phone-local-8k"
+            ]
+          },
+          "input_budget_tokens": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "output_reserve_tokens": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "run_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expected_context_version": {
+            "$ref": "#/components/schemas/Seq"
+          }
+        },
+        "required": []
+      },
+      "Ack": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "cursor"
+        ]
+      },
+      "DemoSessionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "device_id"
+        ],
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "enum": [
+              "phone",
+              "car",
+              "web"
+            ]
+          },
+          "user_id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,63}$",
+            "description": "Optional local development account; omitted defaults to seeded demo-user. Explicit accounts are provisioned in tenant demo; revoked devices are never reactivated."
+          },
+          "client_id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,63}$",
+            "description": "Optional per-page ID; signed agent_id is web-{client_id}, otherwise web-demo."
+          }
+        }
+      },
+      "DemoSessionResponse": {
+        "type": "object",
+        "required": [
+          "token",
+          "expires_at",
+          "device_id",
+          "model",
+          "model_ready"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "30-minute development credential; never the model API key"
+          },
+          "expires_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "device_id": {
+            "type": "string",
+            "enum": [
+              "phone",
+              "car",
+              "web"
+            ]
+          },
+          "model": {
+            "type": "string"
+          },
+          "model_ready": {
+            "type": "boolean"
+          },
+          "tenant_id": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "agent_id": {
+            "type": "string"
+          }
+        }
+      },
+      "DemoChatRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "request_id",
+          "conversation_id",
+          "text"
+        ],
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "conversation_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nonblank text; at most 32768 UTF-8 bytes"
+          }
+        }
+      },
+      "DemoChatResponse": {
+        "type": "object",
+        "required": [
+          "request_id",
+          "conversation_id",
+          "context_id",
+          "reply"
+        ],
+        "properties": {
+          "request_id": {
+            "type": "string"
+          },
+          "conversation_id": {
+            "type": "string"
+          },
+          "context_id": {
+            "type": "string"
+          },
+          "reply": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "Error": {
+        "description": "Structured error code",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}

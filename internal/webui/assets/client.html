@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MemoryHub · 独立客户端</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body data-client-mode="single">
+  <aside id="sidebar" class="sidebar">
+    <button id="close-chats" class="mobile-control close-chats" aria-label="关闭会话列表">×</button>
+    <a class="brand" href="/"><span class="brand-mark">m.</span><span>MemoryHub<small>你的随行助手</small></span></a>
+    <section class="client-controls" aria-label="客户端连接设置">
+      <div class="client-controls-heading"><strong id="client-role-heading">独立客户端</strong> <span>本地模拟</span></div>
+      <form id="connection-form">
+        <label for="account-input">账户 ID</label>
+        <input id="account-input" list="account-examples" value="demo-user" maxlength="64" autocomplete="off" required pattern="[A-Za-z0-9][A-Za-z0-9_.-]{0,63}">
+        <datalist id="account-examples"><option value="demo-user"><option value="alice"><option value="bob"></datalist>
+        <label for="client-device">模拟设备</label>
+        <select id="client-device"><option value="phone">手机 App</option><option value="car">车端 App</option><option value="web">网页端</option></select>
+        <button id="connect-account" type="submit">连接账户</button>
+      </form>
+      <p id="role-description" class="role-description">账户、会话和连接状态仅作用于当前页面。</p>
+      <div class="client-shortcuts"><a id="open-phone" target="_blank" rel="noopener" href="/phone?account=demo-user">打开手机端 ↗</a><a id="open-car" target="_blank" rel="noopener" href="/car?account=demo-user">打开车端 ↗</a><a id="open-cloud" target="_blank" rel="noopener" href="/cloud?account=demo-user">打开云端 Agent ↗</a></div>
+    </section>
+    <button id="new-chat" class="new-chat"><span>＋</span> 新对话</button>
+    <div class="sidebar-heading">最近对话 <button id="refresh" class="icon-button" aria-label="刷新会话" title="刷新会话">↻</button></div>
+    <nav id="conversation-list" aria-label="会话列表"></nav>
+    <div class="sidebar-footer"><span class="online-dot" id="global-dot"></span><div><span id="global-status">正在连接</span><small id="model-name">正在获取模型配置</small></div></div>
+  </aside>
+  <main class="chat-workspace">
+    <header class="chat-header">
+      <div class="chat-heading"><h1 id="session-title">新对话</h1><span id="session-kind">和助手聊聊你的想法</span></div>
+      <div class="header-actions">
+        <button id="show-chats" class="mobile-control" aria-label="打开会话列表">☰ 会话</button>
+        <div class="client-identity"><strong id="active-account">尚未连接</strong><span id="active-device">手机端</span></div>
+        <button id="network-toggle" type="button" class="network-toggle">断开连接</button>
+        <button id="toggle-context" class="context-toggle" aria-expanded="false" aria-controls="context-panel">◈ 上下文</button>
+      </div>
+    </header>
+    <div id="offline-banner" class="offline-banner" role="status" hidden>本页已断开连接。可查看缓存、编辑草稿；重新连接后继续发送。</div>
+    <div class="chat-body">
+      <section class="conversation-pane" aria-label="对话">
+        <div id="messages" class="messages" role="log" aria-label="聊天记录" aria-live="polite" aria-relevant="additions"></div>
+        <div class="input-area">
+          <div id="chat-error" class="chat-error" role="alert" hidden><span id="error-text"></span><button id="dismiss-error" aria-label="关闭错误提示">×</button></div>
+          <div class="composer-topline"><span id="device-description">从手机端发送</span><label id="task-label" for="task-type">对话类型 <select id="task-type"><option value="chat">日常对话</option><option value="trip_planning">行程规划</option></select></label><span id="turn-status"></span></div>
+          <form id="chat-form" class="composer">
+            <textarea id="chat-input" aria-label="消息" placeholder="发送消息，开始一段对话…" rows="2" maxlength="32768"></textarea>
+            <div class="composer-bottom"><span>Enter 发送 · Shift + Enter 换行</span><button id="send" type="submit" class="send-button" aria-label="发送消息">↑</button></div>
+          </form>
+          <p id="sync-summary" class="composer-note">正在连接 MemoryHub…</p>
+        </div>
+      </section>
+      <aside id="context-panel" class="context-panel" aria-label="会话上下文" hidden>
+        <div class="panel-heading"><div><span class="eyebrow">MEMORYHUB</span><h2>会话上下文</h2></div><button id="close-context" class="icon-button" aria-label="关闭上下文">×</button></div>
+        <p class="panel-intro">每次回复前，助手从这里读取当前任务和会话历史。</p>
+        <section class="context-card"><h3>当前任务 <span id="context-status">尚未开始</span></h3><div id="context-values" class="context-values"></div><div id="proposals" class="proposals" aria-label="待确认信息" hidden></div></section>
+        <section class="context-card"><h3>共享历史</h3><strong id="history-count" class="history-count">0 条消息</strong><p>同一账户的其他页面会同步这段历史。</p><div class="replica-status"><span id="client-status">尚未连接</span></div></section>
+        <details class="session-details"><summary>连接信息</summary><dl><dt>会话 ID</dt><dd id="detail-conversation">—</dd><dt>上下文 ID</dt><dd id="detail-context">—</dd><dt>上下文版本</dt><dd id="detail-version">—</dd><dt>当前账户</dt><dd id="detail-account">—</dd><dt>本页客户端 ID</dt><dd id="detail-client">—</dd><dt>同步游标</dt><dd id="detail-cursor">—</dd><dt>本页已发请求数</dt><dd id="detail-requests">0</dd><dt>存储</dt><dd>MemoryHub / PostgreSQL</dd></dl></details>
+      </aside>
+    </div>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
